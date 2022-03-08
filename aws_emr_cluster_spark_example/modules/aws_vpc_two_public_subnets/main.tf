@@ -4,6 +4,7 @@ resource "aws_vpc" "vpc" {
   tags             = {
     Deployment = var.deployment_tag
     Name = "VPC"
+    for-use-with-amazon-emr-managed-policies = true
   }
 }
 
@@ -15,6 +16,7 @@ resource "aws_subnet" "subnet_1" {
   tags                    = {
     Name = "subnet-1"
     Deployment = var.deployment_tag
+    for-use-with-amazon-emr-managed-policies = true
   }
   depends_on = [
     aws_vpc.vpc
@@ -29,6 +31,7 @@ resource "aws_subnet" "subnet_2" {
   tags                    = {
     Name = "subnet-2"
     Deployment = var.deployment_tag
+    for-use-with-amazon-emr-managed-policies = true
   }
   depends_on = [
     aws_vpc.vpc
@@ -71,6 +74,7 @@ resource "aws_default_security_group" "security_group" {
   }
   tags = {
     Deployment = var.deployment_tag
+    for-use-with-amazon-emr-managed-policies = true
   }
   depends_on = [
     aws_vpc.vpc

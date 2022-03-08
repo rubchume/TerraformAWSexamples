@@ -24,7 +24,7 @@ module "emr_service_role" {
 module "ec2_service_role" {
   source = "./modules/aws_service_role"
 
-  service_role_name = "ec2_role"
+  service_role_name = "EMR_EC2_DefaultRole"
   deployment_tag    = var.deployment_tag
   service_principal = "ec2.amazonaws.com"
 }
@@ -33,9 +33,14 @@ module "emr_role_policies" {
   source = "./modules/aws_emr_role_policies"
 }
 
-resource "aws_iam_role_policy_attachment" "emr-role-policy-attach" {
+resource "aws_iam_role_policy_attachment" "emr-role-policy-attach-default" {
   role       = module.emr_service_role.service_role.name
-  policy_arn = module.emr_role_policies.emr_role_policy.arn
+  policy_arn = module.emr_role_policies.emr_role_policy_default.arn
+}
+
+resource "aws_iam_role_policy_attachment" "emr-role-policy-attach-extra" {
+  role       = module.emr_service_role.service_role.name
+  policy_arn = module.emr_role_policies.emr_role_policy_extra.arn
 }
 
 resource "aws_iam_role_policy_attachment" "ec2-role-policy-attach" {
@@ -56,8 +61,6 @@ resource "aws_emr_cluster" "emr_cluster" {
   ec2_attributes {
     instance_profile                  = aws_iam_instance_profile.emr_profile.arn
     subnet_id                         = module.vpc_with_two_public_subnets.subnet_1_id
-#    emr_managed_master_security_group = module.vpc_with_two_public_subnets.security_group.id
-#    emr_managed_slave_security_group  = module.vpc_with_two_public_subnets.security_group.id
   }
 
   master_instance_group {
@@ -74,4 +77,10 @@ resource "aws_emr_cluster" "emr_cluster" {
   tags = {
     for-use-with-amazon-emr-managed-policies = true
   }
+
+  depends_on = [
+    aws_iam_role_policy_attachment.emr-role-policy-attach-default,
+    aws_iam_role_policy_attachment.emr-role-policy-attach-extra,
+    aws_iam_role_policy_attachment.ec2-role-policy-attach
+  ]
 }
