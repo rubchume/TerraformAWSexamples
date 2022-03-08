@@ -50,11 +50,14 @@ resource "aws_iam_instance_profile" "emr_profile" {
 
 resource "aws_emr_cluster" "emr_cluster" {
   name          = "spark-app-udacity"
-  release_label = "emr-4.6.0"
+  release_label = "emr-5.28.0"
   applications  = ["Spark", "Zeppelin"]
 
   ec2_attributes {
-    instance_profile = aws_iam_instance_profile.emr_profile.arn
+    instance_profile                  = aws_iam_instance_profile.emr_profile.arn
+    subnet_id                         = module.vpc_with_two_public_subnets.subnet_1_id
+#    emr_managed_master_security_group = module.vpc_with_two_public_subnets.security_group.id
+#    emr_managed_slave_security_group  = module.vpc_with_two_public_subnets.security_group.id
   }
 
   master_instance_group {
@@ -67,4 +70,8 @@ resource "aws_emr_cluster" "emr_cluster" {
   }
 
   service_role = module.emr_service_role.service_role.arn
+
+  tags = {
+    for-use-with-amazon-emr-managed-policies = true
+  }
 }
