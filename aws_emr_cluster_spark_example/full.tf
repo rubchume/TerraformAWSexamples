@@ -70,10 +70,10 @@ resource "aws_emr_cluster" "emr_cluster" {
   applications  = ["Spark", "Zeppelin"]
 
   ec2_attributes {
-    instance_profile = aws_iam_instance_profile.emr_profile.arn
+    instance_profile                  = aws_iam_instance_profile.emr_profile.arn
     emr_managed_master_security_group = module.vpc_with_public_subnet.security_group.id
-    emr_managed_slave_security_group = module.vpc_with_public_subnet.security_group.id
-    subnet_id = module.vpc_with_public_subnet.subnet_id
+    emr_managed_slave_security_group  = module.vpc_with_public_subnet.security_group.id
+    subnet_id                         = module.vpc_with_public_subnet.subnet_id
   }
 
   master_instance_group {

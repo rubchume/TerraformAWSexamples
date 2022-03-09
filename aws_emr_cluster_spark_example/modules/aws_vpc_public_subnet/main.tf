@@ -42,14 +42,3 @@ resource "aws_security_group" "security_group" {
     ipv6_cidr_blocks = ["::/0"]
   }
 }
-
-resource "aws_default_security_group" "default_security_group" {
-  vpc_id = aws_vpc.vpc.id
-  ingress {
-    from_port   = 5439
-    to_port     = 5439
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-  tags = var.additional_tags
-}
