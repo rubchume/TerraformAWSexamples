@@ -1,7 +1,7 @@
-variable "deployment_tag" {
-  type = string
-  default = "default_tag"
-  description = "A tag that will identify all resources created by current deployment"
+variable "additional_tags" {
+  default = {}
+  description = "Additional resource tags"
+  type = map(string)
 }
 
 variable "service_principal" {

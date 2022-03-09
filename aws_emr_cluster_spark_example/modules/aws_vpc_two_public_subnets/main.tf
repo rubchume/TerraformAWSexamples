@@ -1,11 +1,7 @@
 resource "aws_vpc" "vpc" {
   cidr_block       = var.vpc_cidr
   instance_tenancy = "default"
-  tags             = {
-    Deployment = var.deployment_tag
-    Name = "VPC"
-    for-use-with-amazon-emr-managed-policies = true
-  }
+  tags             = merge(var.additional_tags, {Name = "VPC"})
 }
 
 resource "aws_subnet" "subnet_1" {
@@ -13,11 +9,7 @@ resource "aws_subnet" "subnet_1" {
   cidr_block              = var.subnet_cidr_1
   availability_zone       = var.subnet_availability_zone
   map_public_ip_on_launch = "true"
-  tags                    = {
-    Name = "subnet-1"
-    Deployment = var.deployment_tag
-    for-use-with-amazon-emr-managed-policies = true
-  }
+  tags             = merge(var.additional_tags, {Name = "subnet-1"})
   depends_on = [
     aws_vpc.vpc
   ]
@@ -28,11 +20,7 @@ resource "aws_subnet" "subnet_2" {
   cidr_block              = var.subnet_cidr_2
   availability_zone       = var.subnet_availability_zone
   map_public_ip_on_launch = "true"
-  tags                    = {
-    Name = "subnet-2"
-    Deployment = var.deployment_tag
-    for-use-with-amazon-emr-managed-policies = true
-  }
+  tags             = merge(var.additional_tags, {Name = "subnet-2"})
   depends_on = [
     aws_vpc.vpc
   ]
@@ -72,10 +60,7 @@ resource "aws_default_security_group" "security_group" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
-  tags = {
-    Deployment = var.deployment_tag
-    for-use-with-amazon-emr-managed-policies = true
-  }
+  tags = var.additional_tags
   depends_on = [
     aws_vpc.vpc
   ]

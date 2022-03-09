@@ -23,9 +23,7 @@ data "aws_iam_policy_document" "emr_role_policy_document" {
 resource "aws_iam_policy" "emr_role_policy_extra" {
   name = var.emr_role_policy_name
   policy = data.aws_iam_policy_document.emr_role_policy_document.json
-  tags = {
-    Deployment = var.deployment_tag
-  }
+  tags = var.additional_tags
 }
 
 data "aws_iam_policy_document" "ec2_role_policy_document" {
@@ -62,7 +60,5 @@ data "aws_iam_policy_document" "ec2_role_policy_document" {
 resource "aws_iam_policy" "ec2_role_policy" {
   name = var.ec2_role_policy_name
   policy = data.aws_iam_policy_document.ec2_role_policy_document.json
-  tags = {
-    Deployment = var.deployment_tag
-  }
+  tags = var.additional_tags
 }

@@ -10,14 +10,19 @@ provider "aws" {
 module "vpc_with_two_public_subnets" {
   source = "./modules/aws_vpc_two_public_subnets"
 
-  deployment_tag = var.deployment_tag
+  additional_tags = {
+    Deployment = var.deployment_tag,
+    for-use-with-amazon-emr-managed-policies = true
+  }
 }
 
 module "emr_service_role" {
   source = "./modules/aws_service_role"
 
   service_role_name = "emr_role"
-  deployment_tag    = var.deployment_tag
+  additional_tags = {
+    Deployment = var.deployment_tag
+  }
   service_principal = "elasticmapreduce.amazonaws.com"
 }
 
@@ -25,12 +30,18 @@ module "ec2_service_role" {
   source = "./modules/aws_service_role"
 
   service_role_name = "EMR_EC2_DefaultRole"
-  deployment_tag    = var.deployment_tag
+  additional_tags = {
+    Deployment = var.deployment_tag
+  }
   service_principal = "ec2.amazonaws.com"
 }
 
 module "emr_role_policies" {
   source = "./modules/aws_emr_role_policies"
+
+  additional_tags = {
+    Deployment = var.deployment_tag
+  }
 }
 
 resource "aws_iam_role_policy_attachment" "emr-role-policy-attach-default" {
