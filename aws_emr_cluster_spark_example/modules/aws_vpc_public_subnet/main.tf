@@ -10,16 +10,10 @@ resource "aws_subnet" "subnet" {
   availability_zone       = var.subnet_availability_zone
   map_public_ip_on_launch = "true"
   tags             = merge(var.additional_tags, {Name = "subnet"})
-  depends_on = [
-    aws_vpc.vpc
-  ]
 }
 
 resource "aws_internet_gateway" "vpc_gw" {
   vpc_id     = aws_vpc.vpc.id
-  depends_on = [
-    aws_vpc.vpc
-  ]
 }
 
 resource "aws_route_table" "vpc_route_table" {
@@ -45,7 +39,4 @@ resource "aws_default_security_group" "security_group" {
     cidr_blocks = ["0.0.0.0/0"]
   }
   tags = var.additional_tags
-  depends_on = [
-    aws_vpc.vpc
-  ]
 }
