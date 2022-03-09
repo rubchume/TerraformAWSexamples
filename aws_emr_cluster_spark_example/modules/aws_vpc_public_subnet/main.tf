@@ -30,7 +30,20 @@ resource "aws_route_table_association" "route_table_subnet_association" {
   route_table_id = aws_route_table.vpc_route_table.id
 }
 
-resource "aws_default_security_group" "security_group" {
+resource "aws_security_group" "security_group" {
+  vpc_id = aws_vpc.vpc.id
+  tags = var.additional_tags
+
+  egress {
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+}
+
+resource "aws_default_security_group" "default_security_group" {
   vpc_id = aws_vpc.vpc.id
   ingress {
     from_port   = 5439
