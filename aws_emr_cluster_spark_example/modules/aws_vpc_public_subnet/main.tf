@@ -4,23 +4,12 @@ resource "aws_vpc" "vpc" {
   tags             = merge(var.additional_tags, {Name = "VPC"})
 }
 
-resource "aws_subnet" "subnet_1" {
+resource "aws_subnet" "subnet" {
   vpc_id                  = aws_vpc.vpc.id
-  cidr_block              = var.subnet_cidr_1
+  cidr_block              = var.subnet_cidr
   availability_zone       = var.subnet_availability_zone
   map_public_ip_on_launch = "true"
-  tags             = merge(var.additional_tags, {Name = "subnet-1"})
-  depends_on = [
-    aws_vpc.vpc
-  ]
-}
-
-resource "aws_subnet" "subnet_2" {
-  vpc_id                  = aws_vpc.vpc.id
-  cidr_block              = var.subnet_cidr_2
-  availability_zone       = var.subnet_availability_zone
-  map_public_ip_on_launch = "true"
-  tags             = merge(var.additional_tags, {Name = "subnet-2"})
+  tags             = merge(var.additional_tags, {Name = "subnet"})
   depends_on = [
     aws_vpc.vpc
   ]
@@ -42,13 +31,8 @@ resource "aws_route_table" "vpc_route_table" {
   }
 }
 
-resource "aws_route_table_association" "route_table_subnet1_association" {
-  subnet_id      = aws_subnet.subnet_1.id
-  route_table_id = aws_route_table.vpc_route_table.id
-}
-
-resource "aws_route_table_association" "route_table_subnet2_association" {
-  subnet_id      = aws_subnet.subnet_2.id
+resource "aws_route_table_association" "route_table_subnet_association" {
+  subnet_id      = aws_subnet.subnet.id
   route_table_id = aws_route_table.vpc_route_table.id
 }
 

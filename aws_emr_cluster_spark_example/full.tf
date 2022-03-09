@@ -7,11 +7,11 @@ provider "aws" {
   profile = var.aws_profile
 }
 
-module "vpc_with_two_public_subnets" {
-  source = "./modules/aws_vpc_two_public_subnets"
+module "vpc_with_public_subnet" {
+  source = "./modules/aws_vpc_public_subnet"
 
   additional_tags = {
-    Deployment = var.deployment_tag,
+    Deployment                               = var.deployment_tag,
     for-use-with-amazon-emr-managed-policies = true
   }
 }
@@ -70,8 +70,8 @@ resource "aws_emr_cluster" "emr_cluster" {
   applications  = ["Spark", "Zeppelin"]
 
   ec2_attributes {
-    instance_profile                  = aws_iam_instance_profile.emr_profile.arn
-    subnet_id                         = module.vpc_with_two_public_subnets.subnet_1_id
+    instance_profile = aws_iam_instance_profile.emr_profile.arn
+    subnet_id        = module.vpc_with_public_subnet.subnet_id
   }
 
   master_instance_group {

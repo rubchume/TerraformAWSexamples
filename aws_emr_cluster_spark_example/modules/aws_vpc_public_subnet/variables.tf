@@ -4,16 +4,10 @@ variable "vpc_cidr" {
   description = "Classless Inter-Domain Routing (CIDR) for the VPC. Usually, 10.0.0.0/16"
 }
 
-variable "subnet_cidr_1" {
+variable "subnet_cidr" {
   type = string
   default = "10.0.1.0/24"
   description = "Subnet 1 CIDR"
-}
-
-variable "subnet_cidr_2" {
-  type = string
-  default = "10.0.2.0/24"
-  description = "Subnet 2 CIDR"
 }
 
 variable "subnet_availability_zone" {
