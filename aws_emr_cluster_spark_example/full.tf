@@ -1,6 +1,7 @@
 variable "aws_region" {}
 variable "aws_profile" {}
 variable "deployment_tag" {}
+variable "ec2_ssh_key_name" {}
 
 provider "aws" {
   region  = var.aws_region
@@ -64,6 +65,12 @@ resource "aws_iam_instance_profile" "emr_profile" {
   role = module.ec2_service_role.service_role.name
 }
 
+module "ec2_ssh_key_pair" {
+  source = "../modules/aws_generated_key_pair"
+
+  key_name = var.ec2_ssh_key_name
+}
+
 resource "aws_emr_cluster" "emr_cluster" {
   name          = "spark-app-udacity"
   release_label = "emr-5.28.0"
@@ -74,6 +81,7 @@ resource "aws_emr_cluster" "emr_cluster" {
     emr_managed_master_security_group = module.vpc_with_public_subnet.security_group.id
     emr_managed_slave_security_group  = module.vpc_with_public_subnet.security_group.id
     subnet_id                         = module.vpc_with_public_subnet.subnet_id
+    key_name                          = module.ec2_ssh_key_pair.key_pair.key_name
   }
 
   master_instance_group {
