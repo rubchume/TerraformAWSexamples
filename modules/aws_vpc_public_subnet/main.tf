@@ -1,7 +1,7 @@
 resource "aws_vpc" "vpc" {
   cidr_block       = var.vpc_cidr
   instance_tenancy = "default"
-  tags             = merge(var.additional_tags, {Name = "VPC"})
+  tags             = merge(var.additional_tags, { Name = "VPC" })
 }
 
 resource "aws_subnet" "subnet" {
@@ -9,11 +9,11 @@ resource "aws_subnet" "subnet" {
   cidr_block              = var.subnet_cidr
   availability_zone       = var.subnet_availability_zone
   map_public_ip_on_launch = "true"
-  tags             = merge(var.additional_tags, {Name = "subnet"})
+  tags                    = merge(var.additional_tags, { Name = "subnet" })
 }
 
 resource "aws_internet_gateway" "vpc_gw" {
-  vpc_id     = aws_vpc.vpc.id
+  vpc_id = aws_vpc.vpc.id
 }
 
 resource "aws_route_table" "vpc_route_table" {
@@ -32,7 +32,7 @@ resource "aws_route_table_association" "route_table_subnet_association" {
 
 resource "aws_security_group" "security_group" {
   vpc_id = aws_vpc.vpc.id
-  tags = var.additional_tags
+  tags   = var.additional_tags
 
   egress {
     from_port        = 0

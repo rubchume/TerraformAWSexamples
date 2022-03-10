@@ -8,7 +8,7 @@ provider "aws" {
 }
 
 module "vpc_with_public_subnet" {
-  source = "./modules/aws_vpc_public_subnet"
+  source = "../modules/aws_vpc_public_subnet"
 
   additional_tags = {
     Deployment                               = var.deployment_tag,
@@ -17,7 +17,7 @@ module "vpc_with_public_subnet" {
 }
 
 module "emr_service_role" {
-  source = "./modules/aws_service_role"
+  source = "../modules/aws_service_role"
 
   service_role_name = "emr_role"
   additional_tags = {
@@ -27,7 +27,7 @@ module "emr_service_role" {
 }
 
 module "ec2_service_role" {
-  source = "./modules/aws_service_role"
+  source = "../modules/aws_service_role"
 
   service_role_name = "EMR_EC2_DefaultRole"
   additional_tags = {
@@ -37,7 +37,7 @@ module "ec2_service_role" {
 }
 
 module "emr_role_policies" {
-  source = "./modules/aws_emr_role_policies"
+  source = "../modules/aws_emr_role_policies"
 
   additional_tags = {
     Deployment = var.deployment_tag
