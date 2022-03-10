@@ -34,6 +34,15 @@ resource "aws_security_group" "security_group" {
   vpc_id = aws_vpc.vpc.id
   tags   = var.additional_tags
 
+  ingress {
+    cidr_blocks = [
+      "0.0.0.0/0"
+    ]
+    from_port = 22
+    to_port   = 22
+    protocol  = "tcp"
+  }
+
   egress {
     from_port        = 0
     to_port          = 0
