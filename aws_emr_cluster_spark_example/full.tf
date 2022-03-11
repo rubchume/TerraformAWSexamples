@@ -105,3 +105,16 @@ resource "aws_emr_cluster" "emr_cluster" {
     aws_iam_role_policy_attachment.ec2-role-policy-attach
   ]
 }
+
+resource "local_file" "ec2_key_pem" {
+    content  = module.ec2_ssh_key_pair.private_key.private_key_pem
+    filename = "${module.ec2_ssh_key_pair.key_pair.key_name}.pem"
+}
+
+resource "local_file" "output_variables" {
+  filename = "output_variables.sh"
+  content = <<EOF
+MASTER_NODE_PUBLIC_DNS=${aws_emr_cluster.emr_cluster.master_public_dns}
+EC2_SSH_KEY_PEM_NAME=${local_file.ec2_key_pem.filename}
+EOF
+}

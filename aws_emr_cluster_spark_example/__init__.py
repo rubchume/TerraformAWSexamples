@@ -7,6 +7,15 @@ from terraform_vars_parser import TerraformVarsParser
 WORKING_DIRECTORY = Path(__file__).parent
 
 
+def obsolete(function):
+    def _obsolete_function():
+        raise DeprecationWarning(
+            "This function has been deprecated in favor of the local_file terraform solution to write files"
+        )
+
+    return _obsolete_function()
+
+
 def save_to_file(text, file_path):
     with (WORKING_DIRECTORY / file_path).open("w") as file:
         file.write(text)
@@ -45,6 +54,7 @@ def get_ec2_instance(terraform_state):
     return terraform_state["resources"][0]["instances"][0]["attributes"]["master_public_dns"]
 
 
+@obsolete
 def after_deploy():
     variables_file = WORKING_DIRECTORY / "dev.tfvars"
     parser = TerraformVarsParser()
