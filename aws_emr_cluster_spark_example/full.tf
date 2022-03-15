@@ -1,8 +1,3 @@
-variable "aws_region" {}
-variable "aws_profile" {}
-variable "deployment_tag" {}
-variable "ec2_ssh_key_name" {}
-
 provider "aws" {
   region  = var.aws_region
   profile = var.aws_profile
@@ -111,10 +106,35 @@ resource "local_file" "ec2_key_pem" {
     filename = "${module.ec2_ssh_key_pair.key_pair.key_name}.pem"
 }
 
+data local_file "output_variables_template" {
+  filename = "output_variables_template.txt"
+}
+
+data template_file "output_variables_rendered" {
+  template = data.local_file.output_variables_template.content
+
+  vars = {
+    master_public_dns=aws_emr_cluster.emr_cluster.master_public_dns
+    ec2_key_pem=local_file.ec2_key_pem.filename
+  }
+}
+
 resource "local_file" "output_variables" {
   filename = "output_variables.sh"
-  content = <<EOF
-MASTER_NODE_PUBLIC_DNS=${aws_emr_cluster.emr_cluster.master_public_dns}
-EC2_SSH_KEY_PEM_NAME=${local_file.ec2_key_pem.filename}
-EOF
+  content = data.template_file.output_variables_rendered.rendered
+}
+
+resource "local_file" "connect_to_instance_script" {
+  source = "connect_to_instance.sh"
+  filename = "connect_to_instance_script.sh"
+}
+
+resource "local_file" "copy_file_to_instance_script" {
+  source = "copy_file_to_instance.sh"
+  filename = "copy_file_to_instance_script.sh"
+}
+
+resource "local_file" "ssh_port_forwarding_script" {
+  source = "ssh_port_forwarding_to_master_node.sh"
+  filename = "ssh_port_forwarding_script.sh"
 }
