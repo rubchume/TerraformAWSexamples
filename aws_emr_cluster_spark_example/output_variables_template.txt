@@ -1,0 +1,2 @@
+MASTER_NODE_PUBLIC_DNS=${master_public_dns}
+EC2_SSH_KEY_PEM_NAME=${ec2_key_pem}
