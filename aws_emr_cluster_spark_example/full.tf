@@ -138,3 +138,33 @@ resource "local_file" "ssh_port_forwarding_script" {
   source = "${path.module}/ssh_port_forwarding_to_master_node.sh"
   filename = "ssh_port_forwarding_script.sh"
 }
+
+resource "aws_security_group" "master_instance_security_group_for_notebook_use" {
+  vpc_id = module.vpc_with_public_subnet.vpc.id
+  tags   = {
+    Deployment                               = var.deployment_tag,
+    for-use-with-amazon-emr-managed-policies = true
+  }
+
+  ingress {
+    protocol  = "tcp"
+    from_port = 18888
+    to_port   = 18888
+    cidr_blocks = [module.vpc_with_public_subnet.vpc.cidr_block]
+  }
+}
+
+resource "aws_security_group" "EMR_notebook_security_group_for_notebook_use" {
+  vpc_id = module.vpc_with_public_subnet.vpc.id
+  tags   = {
+    Deployment                               = var.deployment_tag,
+    for-use-with-amazon-emr-managed-policies = true
+  }
+
+  egress {
+    protocol         = "tcp"
+    from_port        = 18888
+    to_port          = 18888
+    cidr_blocks      = [module.vpc_with_public_subnet.vpc.cidr_block]
+  }
+}
