@@ -65,15 +65,14 @@ resource "aws_security_group" "master_instance_security_group_for_notebook_use" 
   }
 }
 
-#resource "aws_security_group" "EMR_notebook_security_group_for_notebook_use" {
-#  vpc_id = aws_vpc.vpc.id
-#  tags   = var.additional_tags
-#
-#  egress {
-#    protocol         = "tcp"
-#    from_port        = 18888
-#    to_port          = 18888
-#    cidr_blocks      = [aws_vpc.vpc.cidr_block]
-#    ipv6_cidr_blocks = [aws_vpc.vpc.ipv6_cidr_block]
-#  }
-#}
+resource "aws_security_group" "EMR_notebook_security_group_for_notebook_use" {
+  vpc_id = aws_vpc.vpc.id
+  tags   = var.additional_tags
+
+  egress {
+    protocol         = "tcp"
+    from_port        = 18888
+    to_port          = 18888
+    cidr_blocks      = [aws_vpc.vpc.cidr_block]
+  }
+}
