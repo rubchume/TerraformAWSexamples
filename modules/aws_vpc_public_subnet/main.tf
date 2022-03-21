@@ -52,3 +52,16 @@ resource "aws_security_group" "security_group" {
     ipv6_cidr_blocks = ["::/0"]
   }
 }
+
+resource "aws_security_group" "security_group_for_notebook" {
+  vpc_id = aws_vpc.vpc.id
+  tags   = var.additional_tags
+
+  egress {
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+}
