@@ -138,3 +138,12 @@ resource "local_file" "ssh_port_forwarding_script" {
   source = "${path.module}/ssh_port_forwarding_to_master_node.sh"
   filename = "ssh_port_forwarding_script.sh"
 }
+
+module "emr_notebook_security_groups" {
+  source = "../modules/aws_emr_notebook_security_groups"
+
+  vpc_id = module.vpc_with_public_subnet.vpc.id
+  additional_tags = {
+    Deployment = var.deployment_tag
+  }
+}
