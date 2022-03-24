@@ -18,6 +18,7 @@ module "emr_service_role" {
   service_role_name = "emr_role"
   additional_tags = {
     Deployment = var.deployment_tag
+    for-use-with-amazon-emr-managed-policies = true
   }
   service_principal = "elasticmapreduce.amazonaws.com"
 }
@@ -28,6 +29,7 @@ module "ec2_service_role" {
   service_role_name = "EMR_EC2_DefaultRole"
   additional_tags = {
     Deployment = var.deployment_tag
+    for-use-with-amazon-emr-managed-policies = true
   }
   service_principal = "ec2.amazonaws.com"
 }
@@ -37,6 +39,7 @@ module "emr_role_policies" {
 
   additional_tags = {
     Deployment = var.deployment_tag
+    for-use-with-amazon-emr-managed-policies = true
   }
 }
 
@@ -145,5 +148,6 @@ module "emr_notebook_security_groups" {
   vpc_id = module.vpc_with_public_subnet.vpc.id
   additional_tags = {
     Deployment = var.deployment_tag
+    for-use-with-amazon-emr-managed-policies = true
   }
 }
