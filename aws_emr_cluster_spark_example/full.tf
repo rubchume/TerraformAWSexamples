@@ -6,6 +6,8 @@ provider "aws" {
 module "vpc_with_public_subnet" {
   source = "../modules/aws_vpc_public_subnet"
 
+  subnet_availability_zone = "${var.aws_region}a"
+
   additional_tags = {
     Deployment                               = var.deployment_tag,
     for-use-with-amazon-emr-managed-policies = true
