@@ -25,6 +25,7 @@ data template_file "output_variables_rendered" {
 
   vars = {
     ecr_repository_url=each.value.repository_url
+    ecr_registry_id=each.value.registry_id
   }
 }
 
