@@ -53,6 +53,37 @@ resource "aws_cloudwatch_log_group" "log-group" {
   }
 }
 
+locals {
+  container_definitions = [
+  for parameters in var.container_parameters : {
+    name : "${var.app_name}-${var.deployment_tag}-${parameters.container_name}",
+    image : "${parameters.image}:latest",
+    essential : true,
+    logConfiguration : {
+      logDriver : "awslogs",
+      options : {
+        "awslogs-group" : aws_cloudwatch_log_group.log-group.id,
+        "awslogs-region" : var.aws_region,
+        "awslogs-stream-prefix" : "${var.app_name}-${var.deployment_tag}"
+      }
+    },
+    portMappings : [
+      {
+        "containerPort" : 8080,
+        "hostPort" : 8080
+      },
+      {
+        "containerPort" : 5000,
+        "hostPort" : 5000
+      }
+    ],
+    cpu : 256,
+    memory : 512,
+    networkMode : "awsvpc"
+  }
+  ]
+}
+
 resource "aws_ecs_task_definition" "task_definition" {
   family                   = var.app_name
   execution_role_arn       = module.ecs_task_execution_role.service_role.arn
@@ -66,38 +97,7 @@ resource "aws_ecs_task_definition" "task_definition" {
     Deployment = var.deployment_tag
   }
 
-  container_definitions = <<DEFINITION
-  [
-    {
-      "name": "${var.app_name}-container",
-      "image": "${var.ecr_repository_url}:latest",
-      "entryPoint": [],
-      "environment": [],
-      "essential": true,
-      "logConfiguration": {
-        "logDriver": "awslogs",
-        "options": {
-          "awslogs-group": "${aws_cloudwatch_log_group.log-group.id}",
-          "awslogs-region": "${var.aws_region}",
-          "awslogs-stream-prefix": "${var.app_name}-${var.deployment_tag}"
-        }
-      },
-      "portMappings": [
-        {
-          "containerPort": 8080,
-          "hostPort": 8080
-        },
-        {
-          "containerPort": 5000,
-          "hostPort": 5000
-        }
-      ],
-      "cpu": 256,
-      "memory": 512,
-      "networkMode": "awsvpc"
-    }
-  ]
-  DEFINITION
+  container_definitions = jsonencode(local.container_definitions)
 }
 
 data "aws_ecs_task_definition" "main" {
