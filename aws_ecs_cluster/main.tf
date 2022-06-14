@@ -7,6 +7,7 @@ module "vpc_with_public_subnet" {
   source = "../modules/aws_vpc_public_subnet"
 
   subnet_availability_zone = "${var.aws_region}a"
+  allowed_ports            = flatten([for parameters in var.container_parameters : parameters.public_ports])
 
   additional_tags = {
     Deployment = var.deployment_tag,
@@ -101,14 +102,6 @@ data "aws_ecs_task_definition" "main" {
   task_definition = aws_ecs_task_definition.task_definition.family
 }
 
-resource "aws_ecs_cluster" "aws-ecs-cluster" {
-  name = "${var.app_name}-ecs-cluster"
-  tags = {
-    Deployment = var.deployment_tag
-  }
-}
-
-
 resource "aws_ecs_service" "aws-ecs-service" {
   name                 = "${var.app_name}-ecs-service"
   cluster              = aws_ecs_cluster.aws-ecs-cluster.id
@@ -124,5 +117,12 @@ resource "aws_ecs_service" "aws-ecs-service" {
     security_groups  = [
       module.vpc_with_public_subnet.security_group.id
     ]
+  }
+}
+
+resource "aws_ecs_cluster" "aws-ecs-cluster" {
+  name = "${var.app_name}-ecs-cluster"
+  tags = {
+    Deployment = var.deployment_tag
   }
 }

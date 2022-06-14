@@ -52,3 +52,14 @@ resource "aws_security_group" "security_group" {
     ipv6_cidr_blocks = ["::/0"]
   }
 }
+
+resource "aws_security_group_rule" "additional_ingress_rules" {
+  for_each = var.allowed_ports
+
+  type              = "ingress"
+  from_port         = each.value
+  to_port           = each.value
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.security_group.id
+}
