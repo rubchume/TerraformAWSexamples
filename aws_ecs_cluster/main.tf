@@ -68,14 +68,11 @@ locals {
       }
     },
     portMappings : [
-      {
-        "containerPort" : 8080,
-        "hostPort" : 8080
-      },
-      {
-        "containerPort" : 5000,
-        "hostPort" : 5000
-      }
+    for port in parameters.public_ports :
+    {
+      containerPort : port
+      hostPort : port
+    }
     ],
     cpu : 256,
     memory : 512,
