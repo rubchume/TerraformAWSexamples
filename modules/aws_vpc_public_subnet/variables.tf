@@ -24,6 +24,6 @@ variable "additional_tags" {
 
 variable "allowed_ports" {
   description = "Additional ports (in addition to 22) that are allowed for ingress TCP connections"
-  type = list(number)
+  type = set(number)
   default = []
 }
