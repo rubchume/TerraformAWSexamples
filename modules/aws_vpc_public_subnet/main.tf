@@ -1,8 +1,8 @@
 resource "aws_vpc" "vpc" {
-  cidr_block       = var.vpc_cidr
-  instance_tenancy = "default"
+  cidr_block           = var.vpc_cidr
+  instance_tenancy     = "default"
   enable_dns_hostnames = true
-  tags             = merge(var.additional_tags, { Name = "VPC" })
+  tags                 = merge(var.additional_tags, { Name = "VPC" })
 }
 
 resource "aws_subnet" "subnet" {
@@ -53,8 +53,12 @@ resource "aws_security_group" "security_group" {
   }
 }
 
+locals {
+  auxiliar_port_map = {for port in var.allowed_ports : tostring(port) => port}
+}
+
 resource "aws_security_group_rule" "additional_ingress_rules" {
-  for_each = var.allowed_ports
+  for_each = local.auxiliar_port_map
 
   type              = "ingress"
   from_port         = each.value
