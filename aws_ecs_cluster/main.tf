@@ -75,7 +75,7 @@ locals {
       hostPort : port
     }
     ],
-    cpu : 256,
+    cpu : floor(var.number_of_cpus / length(var.container_parameters)),
     memory : 512,
     networkMode : "awsvpc"
   }
@@ -87,7 +87,7 @@ resource "aws_ecs_task_definition" "task_definition" {
   execution_role_arn       = module.ecs_task_execution_role.service_role.arn
   task_role_arn            = module.ecs_task_role.service_role.arn
   network_mode             = "awsvpc"
-  cpu                      = "256"
+  cpu                      = var.number_of_cpus
   memory                   = "1024"
   requires_compatibilities = ["FARGATE"]
 

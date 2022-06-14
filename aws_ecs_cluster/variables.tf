@@ -11,3 +11,8 @@ variable "container_parameters" {
     public_ports = list(number)
   }))
 }
+
+variable "number_of_cpus" {
+  type = number
+  default = 256
+}
