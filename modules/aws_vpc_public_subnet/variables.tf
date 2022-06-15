@@ -21,3 +21,9 @@ variable "additional_tags" {
   description = "Additional resource tags"
   type = map(string)
 }
+
+variable "allowed_ports" {
+  description = "Additional ports (in addition to 22) that are allowed for ingress TCP connections"
+  type = set(number)
+  default = []
+}
