@@ -8,8 +8,8 @@ resource "aws_vpc" "vpc" {
 resource "aws_subnet" "private_subnets" {
   vpc_id            = aws_vpc.vpc.id
   for_each          = var.private_subnets
-  cidr_block        = element(each.value.cidr_block, count.index)
-  availability_zone = element(each.value.availability_zone, count.index)
+  cidr_block        = each.value.cidr_block
+  availability_zone = each.value.availability_zone
 
   tags = merge(
     var.additional_tags,
@@ -22,8 +22,8 @@ resource "aws_subnet" "private_subnets" {
 resource "aws_subnet" "public_subnets" {
   vpc_id                  = aws_vpc.vpc.id
   for_each                = var.public_subnets
-  cidr_block              = element(each.value.cidr_block, count.index)
-  availability_zone       = element(each.value.availability_zone, count.index)
+  cidr_block              = each.value.cidr_block
+  availability_zone       = each.value.availability_zone
   map_public_ip_on_launch = "true"
 
   tags = merge(
