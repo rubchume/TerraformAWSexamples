@@ -3,10 +3,21 @@ provider "aws" {
   profile = var.aws_profile
 }
 
-module "vpc_with_public_subnet" {
-  source = "../modules/aws_vpc_public_subnet"
+module "vpc_with_public_and_private_subnet" {
+  source = "../modules/aws_vpc_with_subnets"
 
-  subnet_availability_zone = "${var.aws_region}a"
+  public_subnets = {
+    public_subnet = {
+      cidr_block        = "10.0.101.0/24",
+      availability_zone = "eu-west-3a"
+    }
+  }
+  private_subnets = {
+    private_subnet = {
+      cidr_block        = "10.0.1.0/24",
+      availability_zone = "eu-west-3a"
+    }
+  }
   allowed_ports            = flatten([for parameters in var.container_parameters : parameters.public_ports])
 
   additional_tags = {
@@ -112,10 +123,10 @@ resource "aws_ecs_service" "aws-ecs-service" {
   force_new_deployment = true
 
   network_configuration {
-    subnets          = [module.vpc_with_public_subnet.subnet_id]
+    subnets          = module.vpc_with_public_and_private_subnet.private_subnet_ids
     assign_public_ip = true
     security_groups  = [
-      module.vpc_with_public_subnet.security_group.id
+      module.vpc_with_public_and_private_subnet.security_group.id
     ]
   }
 }
