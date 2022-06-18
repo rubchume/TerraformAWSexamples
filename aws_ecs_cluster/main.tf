@@ -124,7 +124,7 @@ resource "aws_ecs_service" "aws-ecs-service" {
 
   network_configuration {
     subnets          = values(module.vpc_with_public_and_private_subnet.private_subnet_ids)
-    assign_public_ip = true
+    assign_public_ip = false
     security_groups  = [
       module.vpc_with_public_and_private_subnet.security_group.id
     ]
