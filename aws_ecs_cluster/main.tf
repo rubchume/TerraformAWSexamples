@@ -142,7 +142,7 @@ resource "aws_alb" "application_load_balancer" {
   name               = "${var.app_name}-alb"
   internal           = false
   load_balancer_type = "application"
-  subnets            = module.vpc_with_public_and_private_subnet.public_subnet_ids
+  subnets            = values(module.vpc_with_public_and_private_subnet.public_subnet_ids)
   security_groups    = [module.vpc_with_public_and_private_subnet.security_group.id]
 
   tags = {
