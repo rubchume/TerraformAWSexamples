@@ -7,9 +7,13 @@ module "vpc_with_public_and_private_subnet" {
   source = "../modules/aws_vpc_with_subnets"
 
   public_subnets = {
-    public_subnet = {
+    public_subnet_1 = {
       cidr_block        = "10.0.101.0/24",
       availability_zone = "eu-west-3a"
+    }
+    public_subnet_2 = {
+      cidr_block        = "10.0.102.0/24",
+      availability_zone = "eu-west-3b"
     }
   }
   private_subnets = {
