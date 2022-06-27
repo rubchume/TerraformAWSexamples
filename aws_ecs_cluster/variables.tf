@@ -12,6 +12,10 @@ variable "container_parameters" {
   }))
 }
 
+variable "main_container" {
+  type = "string"
+}
+
 variable "number_of_cpus" {
   type = number
   default = 256

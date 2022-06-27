@@ -140,6 +140,11 @@ resource "aws_security_group" "service_security_group" {
   }
 }
 
+locals {
+  container_parameters_by_container_name = {for container in var.container_parameters: container.container_name => container}
+  main_container = local.container_parameters_by_container_name[var.main_container]
+}
+
 resource "aws_ecs_service" "aws-ecs-service" {
   name                 = "${var.app_name}-ecs-service"
   cluster              = aws_ecs_cluster.aws-ecs-cluster.id
@@ -156,6 +161,12 @@ resource "aws_ecs_service" "aws-ecs-service" {
       module.vpc_with_public_and_private_subnet.security_group.id,
       aws_security_group.service_security_group.id
     ]
+  }
+
+  load_balancer {
+    target_group_arn = aws_lb_target_group.target_group.arn
+    container_name   = "${var.app_name}-${var.deployment_tag}-${local.main_container.container_name}"
+    container_port   = element(local.main_container.public_ports, 0)
   }
 }
 
