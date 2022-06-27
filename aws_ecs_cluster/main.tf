@@ -228,5 +228,5 @@ module "nat_gateway" {
 
   vpc_id = module.vpc_with_public_and_private_subnet.vpc.id
   public_subnet_id = module.vpc_with_public_and_private_subnet.public_subnet_ids["public_subnet_1"]
-  private_subnet_id = module.vpc_with_public_and_private_subnet.public_subnet_ids["public_subnet"]
+  private_subnet_id = module.vpc_with_public_and_private_subnet.private_subnet_ids["private_subnet"]
 }
