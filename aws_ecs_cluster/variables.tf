@@ -13,7 +13,7 @@ variable "container_parameters" {
 }
 
 variable "main_container" {
-  type = "string"
+  type = string
 }
 
 variable "number_of_cpus" {
