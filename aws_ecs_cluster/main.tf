@@ -221,3 +221,12 @@ resource "aws_lb_listener" "listener" {
     target_group_arn = aws_lb_target_group.target_group.id
   }
 }
+
+
+module "nat_gateway" {
+  source = "../modules/aws_nat_gateway_for_subnet"
+
+  vpc_id = module.vpc_with_public_and_private_subnet.vpc.id
+  public_subnet_id = module.vpc_with_public_and_private_subnet.public_subnet_ids["public_subnet_1"]
+  private_subnet_id = module.vpc_with_public_and_private_subnet.public_subnet_ids["public_subnet"]
+}
