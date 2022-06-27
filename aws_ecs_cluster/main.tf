@@ -91,7 +91,7 @@ locals {
     }
     ],
     cpu : floor(var.number_of_cpus / length(var.container_parameters)),
-    memory : 512,
+    memory : floor(var.memory / length(var.container_parameters)),
     networkMode : "awsvpc"
   }
   ]
@@ -117,6 +117,29 @@ data "aws_ecs_task_definition" "main" {
   task_definition = aws_ecs_task_definition.task_definition.family
 }
 
+resource "aws_security_group" "service_security_group" {
+  vpc_id = module.vpc_with_public_and_private_subnet.vpc.id
+
+  ingress {
+    from_port       = 0
+    to_port         = 0
+    protocol        = "-1"
+    security_groups = [module.vpc_with_public_and_private_subnet.security_group.id]
+  }
+
+  egress {
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+
+  tags = {
+    Deployment = var.deployment_tag
+  }
+}
+
 resource "aws_ecs_service" "aws-ecs-service" {
   name                 = "${var.app_name}-ecs-service"
   cluster              = aws_ecs_cluster.aws-ecs-cluster.id
@@ -130,7 +153,8 @@ resource "aws_ecs_service" "aws-ecs-service" {
     subnets          = values(module.vpc_with_public_and_private_subnet.private_subnet_ids)
     assign_public_ip = false
     security_groups  = [
-      module.vpc_with_public_and_private_subnet.security_group.id
+      module.vpc_with_public_and_private_subnet.security_group.id,
+      aws_security_group.service_security_group.id
     ]
   }
 }

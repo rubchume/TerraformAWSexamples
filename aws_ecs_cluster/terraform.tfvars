@@ -8,6 +8,6 @@ container_parameters = [
   {
     image = "955062508589.dkr.ecr.eu-west-3.amazonaws.com/instagramscraper"
     container_name = "scraperMaster"
-    public_ports = [5000]
+    public_ports = [5000, 80]
   }
 ]

@@ -16,3 +16,8 @@ variable "number_of_cpus" {
   type = number
   default = 256
 }
+
+variable "memory" {
+  type = number
+  default = 1024
+}

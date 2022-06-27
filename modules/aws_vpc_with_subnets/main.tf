@@ -2,6 +2,7 @@ resource "aws_vpc" "vpc" {
   cidr_block           = var.vpc_cidr
   instance_tenancy     = "default"
   enable_dns_hostnames = true
+  enable_dns_support   = true
   tags                 = merge(var.additional_tags, { Name = "VPC" })
 }
 
@@ -36,6 +37,7 @@ resource "aws_subnet" "public_subnets" {
 
 resource "aws_internet_gateway" "vpc_gw" {
   vpc_id = aws_vpc.vpc.id
+  tags = var.additional_tags
 }
 
 resource "aws_route_table" "vpc_route_table" {
@@ -45,6 +47,8 @@ resource "aws_route_table" "vpc_route_table" {
     cidr_block = "0.0.0.0/0"
     gateway_id = aws_internet_gateway.vpc_gw.id
   }
+
+  tags = var.additional_tags
 }
 
 resource "aws_route_table_association" "route_table_subnet_association" {
