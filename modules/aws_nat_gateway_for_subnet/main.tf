@@ -19,4 +19,4 @@ resource "aws_route_table" "instance" {
 resource "aws_route_table_association" "instance" {
   subnet_id = var.private_subnet_id
   route_table_id = aws_route_table.instance.id
-}¡
+}
