@@ -183,7 +183,6 @@ module "aws_load_balancer" {
   }
 }
 
-
 module "nat_gateway" {
   source = "../modules/aws_nat_gateway_for_subnet"
 
