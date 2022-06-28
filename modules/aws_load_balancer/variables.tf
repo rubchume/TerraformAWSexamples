@@ -5,7 +5,7 @@ variable "additional_tags" {
 }
 
 variable "subnet_ids" {
-  type = list(number)
+  type = list(string)
 }
 
 variable "vpc_id" {
