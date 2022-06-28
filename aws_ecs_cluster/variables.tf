@@ -8,7 +8,7 @@ variable "container_parameters" {
   type = list(object({
     image = string
     container_name = string
-    public_ports = list(number)
+    public_port = number
   }))
 }
 

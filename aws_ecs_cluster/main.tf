@@ -22,7 +22,7 @@ module "vpc_with_public_and_private_subnet" {
       availability_zone = "eu-west-3a"
     }
   }
-  allowed_ports = flatten([for parameters in var.container_parameters : parameters.public_ports])
+  allowed_ports = [for parameters in var.container_parameters : parameters.public_port]
 
   additional_tags = {
     Deployment = var.deployment_tag,
@@ -83,10 +83,9 @@ locals {
       }
     },
     portMappings : [
-    for port in parameters.public_ports :
     {
-      containerPort : port
-      hostPort : port
+      containerPort : parameters.public_port
+      hostPort : parameters.public_port
     }
     ],
     cpu : floor(var.number_of_cpus / length(var.container_parameters)),
@@ -161,7 +160,7 @@ resource "aws_ecs_service" "aws-ecs-service" {
   load_balancer {
     target_group_arn = module.aws_load_balancer.target_group.arn
     container_name   = "${var.app_name}-${var.deployment_tag}-${local.main_container.container_name}"
-    container_port   = element(local.main_container.public_ports, 0)
+    container_port   = local.main_container.public_port
   }
 }
 
