@@ -3,11 +3,26 @@ provider "aws" {
   profile = var.aws_profile
 }
 
-module "vpc_with_public_subnet" {
-  source = "../modules/aws_vpc_public_subnet"
+module "vpc_with_public_and_private_subnet" {
+  source = "../modules/aws_vpc_with_subnets"
 
-  subnet_availability_zone = "${var.aws_region}a"
-  allowed_ports            = flatten([for parameters in var.container_parameters : parameters.public_ports])
+  public_subnets = {
+    public_subnet_1 = {
+      cidr_block        = "10.0.101.0/24",
+      availability_zone = "eu-west-3a"
+    }
+    public_subnet_2 = {
+      cidr_block        = "10.0.102.0/24",
+      availability_zone = "eu-west-3b"
+    }
+  }
+  private_subnets = {
+    private_subnet = {
+      cidr_block        = "10.0.1.0/24",
+      availability_zone = "eu-west-3a"
+    }
+  }
+  allowed_ports = [for parameters in var.container_parameters : parameters.public_port]
 
   additional_tags = {
     Deployment = var.deployment_tag,
@@ -28,7 +43,6 @@ resource "aws_iam_role_policy_attachment" "ecs-task-execution-role-policy-attach
   role       = module.ecs_task_execution_role.service_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
-
 
 module "ecs_task_role" {
   source = "../modules/aws_service_role"
@@ -69,14 +83,13 @@ locals {
       }
     },
     portMappings : [
-    for port in parameters.public_ports :
     {
-      containerPort : port
-      hostPort : port
+      containerPort : parameters.public_port
+      hostPort : parameters.public_port
     }
     ],
     cpu : floor(var.number_of_cpus / length(var.container_parameters)),
-    memory : 512,
+    memory : floor(var.memory / length(var.container_parameters)),
     networkMode : "awsvpc"
   }
   ]
@@ -98,8 +111,32 @@ resource "aws_ecs_task_definition" "task_definition" {
   container_definitions = jsonencode(local.container_definitions)
 }
 
-data "aws_ecs_task_definition" "main" {
-  task_definition = aws_ecs_task_definition.task_definition.family
+resource "aws_security_group" "service_security_group" {
+  vpc_id = module.vpc_with_public_and_private_subnet.vpc.id
+
+  ingress {
+    from_port       = 0
+    to_port         = 0
+    protocol        = "-1"
+    security_groups = [module.vpc_with_public_and_private_subnet.security_group.id]
+  }
+
+  egress {
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+
+  tags = {
+    Deployment = var.deployment_tag
+  }
+}
+
+locals {
+  container_parameters_by_container_name = {for container in var.container_parameters: container.container_name => container}
+  main_container = local.container_parameters_by_container_name[var.main_container]
 }
 
 resource "aws_ecs_service" "aws-ecs-service" {
@@ -112,11 +149,18 @@ resource "aws_ecs_service" "aws-ecs-service" {
   force_new_deployment = true
 
   network_configuration {
-    subnets          = [module.vpc_with_public_subnet.subnet_id]
-    assign_public_ip = true
+    subnets          = values(module.vpc_with_public_and_private_subnet.private_subnet_ids)
+    assign_public_ip = false
     security_groups  = [
-      module.vpc_with_public_subnet.security_group.id
+      module.vpc_with_public_and_private_subnet.security_group.id,
+      aws_security_group.service_security_group.id
     ]
+  }
+
+  load_balancer {
+    target_group_arn = module.aws_load_balancer.target_group.arn
+    container_name   = "${var.app_name}-${var.deployment_tag}-${local.main_container.container_name}"
+    container_port   = local.main_container.public_port
   }
 }
 
@@ -125,4 +169,23 @@ resource "aws_ecs_cluster" "aws-ecs-cluster" {
   tags = {
     Deployment = var.deployment_tag
   }
+}
+
+module "aws_load_balancer" {
+  source = "../modules/aws_load_balancer"
+
+  vpc_id = module.vpc_with_public_and_private_subnet.vpc.id
+  subnet_ids = values(module.vpc_with_public_and_private_subnet.public_subnet_ids)
+
+  additional_tags = {
+    Deployment = var.deployment_tag
+  }
+}
+
+module "nat_gateway" {
+  source = "../modules/aws_nat_gateway_for_subnet"
+
+  vpc_id = module.vpc_with_public_and_private_subnet.vpc.id
+  public_subnet_id = module.vpc_with_public_and_private_subnet.public_subnet_ids["public_subnet_1"]
+  private_subnet_id = module.vpc_with_public_and_private_subnet.private_subnet_ids["private_subnet"]
 }
