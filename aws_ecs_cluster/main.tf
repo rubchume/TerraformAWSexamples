@@ -44,7 +44,6 @@ resource "aws_iam_role_policy_attachment" "ecs-task-execution-role-policy-attach
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
-
 module "ecs_task_role" {
   source = "../modules/aws_service_role"
 
@@ -111,10 +110,6 @@ resource "aws_ecs_task_definition" "task_definition" {
   }
 
   container_definitions = jsonencode(local.container_definitions)
-}
-
-data "aws_ecs_task_definition" "main" {
-  task_definition = aws_ecs_task_definition.task_definition.family
 }
 
 resource "aws_security_group" "service_security_group" {
