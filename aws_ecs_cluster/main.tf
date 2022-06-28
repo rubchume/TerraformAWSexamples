@@ -164,7 +164,7 @@ resource "aws_ecs_service" "aws-ecs-service" {
   }
 
   load_balancer {
-    target_group_arn = aws_lb_target_group.target_group.arn
+    target_group_arn = module.aws_load_balancer.target_group.arn
     container_name   = "${var.app_name}-${var.deployment_tag}-${local.main_container.container_name}"
     container_port   = element(local.main_container.public_ports, 0)
   }
@@ -177,48 +177,14 @@ resource "aws_ecs_cluster" "aws-ecs-cluster" {
   }
 }
 
-resource "aws_alb" "application_load_balancer" {
-  name               = "${var.app_name}-alb"
-  internal           = false
-  load_balancer_type = "application"
-  subnets            = values(module.vpc_with_public_and_private_subnet.public_subnet_ids)
-  security_groups    = [module.vpc_with_public_and_private_subnet.security_group.id]
+module "aws_load_balancer" {
+  source = "../modules/aws_load_balancer"
 
-  tags = {
+  vpc_id = module.vpc_with_public_and_private_subnet.vpc.id
+  subnet_ids = values(module.vpc_with_public_and_private_subnet.public_subnet_ids)
+
+  additional_tags = {
     Deployment = var.deployment_tag
-  }
-}
-
-resource "aws_lb_target_group" "target_group" {
-  name        = "${var.app_name}-tg"
-  port        = 80
-  protocol    = "HTTP"
-  target_type = "ip"
-  vpc_id      = module.vpc_with_public_and_private_subnet.vpc.id
-
-  health_check {
-    healthy_threshold   = "3"
-    interval            = "300"
-    protocol            = "HTTP"
-    matcher             = "200"
-    timeout             = "3"
-    path                = "/v1/status"
-    unhealthy_threshold = "2"
-  }
-
-  tags = {
-    Deployment = var.deployment_tag
-  }
-}
-
-resource "aws_lb_listener" "listener" {
-  load_balancer_arn = aws_alb.application_load_balancer.id
-  port              = "80"
-  protocol          = "HTTP"
-
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.target_group.id
   }
 }
 
