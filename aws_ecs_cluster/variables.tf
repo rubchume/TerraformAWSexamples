@@ -25,3 +25,8 @@ variable "memory" {
   type = number
   default = 1024
 }
+
+variable "alb_idle_timeout" {
+  type = number
+  default = 60
+}

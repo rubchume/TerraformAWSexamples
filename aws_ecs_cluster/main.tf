@@ -177,6 +177,8 @@ module "aws_load_balancer" {
   vpc_id = module.vpc_with_public_and_private_subnet.vpc.id
   subnet_ids = values(module.vpc_with_public_and_private_subnet.public_subnet_ids)
 
+  idle_timeout = var.alb_idle_timeout
+
   additional_tags = {
     Deployment = var.deployment_tag
   }

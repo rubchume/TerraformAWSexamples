@@ -27,6 +27,8 @@ resource "aws_alb" "application_load_balancer" {
   subnets            = var.subnet_ids
   security_groups    = [aws_security_group.load_balancer_security_group.id]
 
+  idle_timeout = var.idle_timeout
+
   tags = var.additional_tags
 }
 
