@@ -11,3 +11,7 @@ variable "subnet_ids" {
 variable "vpc_id" {
   type = string
 }
+
+variable "idle_timeout" {
+  type = number
+}
