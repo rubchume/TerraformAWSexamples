@@ -142,6 +142,7 @@ resource "aws_redshift_cluster" "default" {
   master_username = var.rs_master_username
   master_password = var.rs_master_pass
 
+  default_iam_role_arn = aws_iam_role.redshift_role.arn
   iam_roles  = [aws_iam_role.redshift_role.arn]
   depends_on = [
     aws_vpc.redshift_vpc,
