@@ -5,3 +5,8 @@ variable "aws_lambda_function" {
     function_name = string
   })
 }
+
+variable "endpoint_path" {
+  description = "The endpoint path that will redirect the call to the Lambda function"
+  type = string
+}
